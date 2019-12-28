@@ -4,7 +4,6 @@ services:
     build: apps/back
     command: npm start
     environment:
-      - NODE_ENV=production
       - PORT=3000
     volumes:
       - ./apps/back:/app
@@ -15,7 +14,6 @@ services:
     build: apps/app
     command: npm start
     environment:
-      - NODE_ENV=production
       - PORT=8080
     volumes:
       - ./apps/app:/app
