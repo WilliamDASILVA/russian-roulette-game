@@ -1,0 +1,21 @@
+version: '2'
+services:
+  back:
+    build: apps/back
+    command: npm run dev
+    environment:
+      - PORT=3000
+    volumes:
+      - ./apps/back:/app
+    ports:
+      - 3000:3000
+      - 3001:3001
+  app:
+    build: apps/app
+    command: npm run dev
+    environment:
+      - PORT=8080
+    volumes:
+      - ./apps/app:/app
+    ports:
+      - 8080:8080
