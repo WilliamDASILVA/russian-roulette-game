@@ -13,7 +13,7 @@ services:
       - 3001:3001
   app:
     build: apps/app
-    command: bash -c "VUE_APP_API_ENDPOINT=http://178.62.12.76:3000 npm start"
+    command: bash -c "VUE_APP_API_ENDPOINT='http://178.62.12.76:3000' npm start"
     environment:
       - PORT=80
     volumes:
