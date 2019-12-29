@@ -175,8 +175,7 @@
         // 180 + 540 + 0 => 720 => 1.5
         // 180 + 540 + 180 => 900 => 2
         // 180 + 900 + 0 => 1080 2.5
-
-        return 180 + ((360 / activePlayers.length) * playerIndex)
+        return ((360 / activePlayers.length) * playerIndex)
       },
       computedLetters () {
         const { activePlayers } = this.getCurrentRoom
