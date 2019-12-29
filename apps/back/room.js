@@ -28,6 +28,7 @@ module.exports = class Room {
     this.word_to_guess = null
     this.currentPlayer = null
     this.timer = null
+    this.gameStartTimeout = null
   }
 
   addPlayer (player) {
@@ -78,17 +79,21 @@ module.exports = class Room {
     console.log('player joined room?', player)
 
     if (this.activePlayers.length >= 2) {
+      if (this.state === 'starting') {
+        return false
+      }
+
       this.state = 'starting'
-      const GAME_START_IN = 5000
+      const GAME_START_AT = Date.now() + 5000
 
       io.to(this.id).emit('room_starting', {
         state: this.state,
-        game_start_in: GAME_START_IN
+        game_start_at: GAME_START_AT
       })
 
       setTimeout(() => {
         this.startGame()
-      }, GAME_START_IN)
+      }, 5000)
     }
 
     io.to(this.id)

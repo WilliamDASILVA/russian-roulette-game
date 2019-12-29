@@ -132,13 +132,13 @@
       }
     },
     mounted () {
-      this.$socket.on('room_starting', ({ game_start_in, state }) => {
+      this.$socket.on('room_starting', ({ game_start_at, state }) => {
         const room = this.$store.getters.getCurrentRoom
         this.$store.commit('SET_ROOM', {
           ...room,
           state
         })
-        this.waitingTimer = game_start_in
+        this.waitingTimer = game_start_at - Date.now()
         const interval = setInterval(() => {
           this.waitingTimer -= 1000
         }, 1000)
@@ -146,7 +146,7 @@
         setTimeout(() => {
           this.waitingTimer = null
           clearInterval(interval)
-        }, game_start_in)
+        }, this.waitingTimer)
       })
       this.$socket.on('room_next_player', () => {
         this.typingWord = null
