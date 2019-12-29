@@ -14,9 +14,9 @@ services:
     build: apps/app
     command: npm start
     environment:
-      - PORT=8080
+      - PORT=80
     volumes:
       - ./apps/app:/app
       - /app/node_modules
     ports:
-      - 8080:8080
+      - 80:80
