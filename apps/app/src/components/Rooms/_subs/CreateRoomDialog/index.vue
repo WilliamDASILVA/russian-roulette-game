@@ -120,6 +120,7 @@
   .create-room-dialog__wrapper__header__title {
     font-size: 1.5rem;
     font-weight: 400;
+    color: rgba(0, 0, 0, 0.86);
   }
 
   .create-room-dialog__wrapper__header__close {
