@@ -7,6 +7,7 @@
     >
       <form
         @submit.prevent="submitted"
+        class="player-join-form__wrapper"
       >
         <div
           class="player-join-form__label-container"
@@ -20,6 +21,7 @@
         </div>
         <div class="player-join-form__fields">
           <ValidationProvider
+            v-slot="{ invalid, errors }"
             name="username"
             rules="required"
             class="player-join-form__fields__field"
@@ -29,6 +31,9 @@
               id="name"
               type="text"
               class="field"
+              :class="{
+                'field--invalid': invalid && errors.length > 0
+              }"
               required
             >
           </ValidationProvider>
@@ -85,15 +90,21 @@
     margin-bottom: 8px;
   }
 
+  .player-join-form__wrapper {
+    background-color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+  }
+
   .player-join-form__label {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(0, 0, 0, 0.6);
     font-size: 1rem;
   }
 
   .player-join-form__error {
     display: flex;
-    color: #D53F8C;
-    font-size: 0.8rem;
+    color: #c53030;
+    font-size: 0.9rem;
     margin-top: 8px;
   }
 
