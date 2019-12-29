@@ -1,10 +1,14 @@
 <template>
   <div class="home">
-    <h1>
-      Bombparty clone
-    </h1>
+    <div class="home__container">
+      <img
+        class="home__container__logo"
+        src="@/assets/img/logo.png"
+        alt="Bombparty Clone"
+      >
 
-    <PlayerJoinForm />
+      <PlayerJoinForm />
+    </div>
   </div>
 </template>
 
@@ -21,3 +25,20 @@
     }
   }
 </script>
+
+<style lang="css" scoped>
+  .home {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .home__container {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+  }
+
+  .home__container__logo {
+    margin: 0 auto 32px auto;
+  }
+</style>

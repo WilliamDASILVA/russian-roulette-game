@@ -1,105 +1,33 @@
 <template>
   <div class="room">
-    <template
-      v-if="getCurrentRoom"
-    >
-      <h1>
-        Room ({{ getCurrentRoom.name }})
+    <div class="room__sidebar">
+      <h1 class="room__sidebar__title">
+        {{ getCurrentRoom.name }}
       </h1>
-
-      Player in the room:
-      <ul>
-        <li
-          v-for="player in getCurrentRoom.players"
-          :key="player.id"
-        >
-          {{ player.name }}
-        </li>
-      </ul>
-
-      <template
-        v-if="getCurrentRoom.state === 'started'"
-      >
-        Player in the game:
+      <div class="room__sidebar__players">
+        <h2 class="room__sidebar__players__title">
+          Players
+        </h2>
         <ul>
           <li
-            v-for="player in getCurrentRoom.activePlayers"
+            v-for="player in getCurrentRoom.players"
             :key="player.id"
+            class="room__sidebar__players__item"
           >
-            {{ player.name }} - Heart: {{ player.heart }}
-            <span
-              v-if="player.id === getCurrentRoom.currentPlayer.id && typingWord"
-            >
-              {{ typingWord }}
-            </span>
+            {{ player.name }}
           </li>
         </ul>
-      </template>
-      
-
-      <template
-        v-if="getCurrentRoom.state === 'created'"
+      </div>
+    </div>
+    <div class="room__content">
+      <img
+        class="room__content__logo"
+        src="@/assets/img/logo.png"
+        alt="Bombparty Clone"
       >
-        <button
-          v-if="!hasJoinedGame"
-          type="button"
-          @click="joinGame"
-        >
-          Join game
-        </button>
-      </template>
 
-      <template
-        v-if="getCurrentRoom.state === 'starting'"
-      >
-        Waiting players...
-        Timer: {{ waitingTimer }}
-      </template>
-
-      <template
-        v-if="getCurrentRoom.state === 'started'"
-      >
-        <template
-          v-if="isPlaying"
-        >
-          Find a word with "{{ getCurrentRoom.word_to_guess }}"
-          <form
-            @submit.prevent="guessWord"
-          >
-            <label for="word">
-              Word:
-            </label>
-            <input
-              v-model="guessingWord"
-              type="text" name="word" id="word"
-              @input="typeWord"
-            >
-          </form>
-          
-          Letters to use:
-          <ul>
-            <li
-              v-for="letter in getCurrentRoom.currentPlayer.lettersToUse"
-              :key="letter"
-            >
-              {{ letter }}
-            </li>
-          </ul>
-        </template>
-      </template>
-
-      <template
-        v-if="getCurrentRoom.state === 'finished'"
-      >
-        The winner is: {{ winner.name }}
-      </template>
-    </template>
-    <template
-      v-else
-    >
-      Loading...
-    </template>
-    {{ $socket.id }}
+      <RoomGame />
+    </div>
   </div>
 </template>
 
@@ -107,11 +35,16 @@
   import Vue from 'vue'
   import { mapGetters } from 'vuex'
 
+  import RoomGame from './_subs/RoomGame'
+
   /**
    * @module component - room
    */
   export default {
     name: 'room',
+    components: {
+      RoomGame
+    },
     beforeRouteEnter (to, from, next) {
       Vue.socket.emit('room_join', {
         id: to.params.id
@@ -119,26 +52,8 @@
 
       next()
     },
-    data () {
-      return {
-        guessingWord: null,
-        waitingTimer: null,
-        typingWord: null
-      }
-    },
     computed: {
-      ...mapGetters(['getCurrentRoom']),
-      isPlaying () {
-        return this.getCurrentRoom.currentPlayer && this.$socket.id === this.getCurrentRoom.currentPlayer.id
-      },
-      winner () {
-        const { activePlayers } = this.getCurrentRoom
-        return activePlayers.filter(player => player.heart > 0)[0]
-      },
-      hasJoinedGame () {
-        const { activePlayers } = this.getCurrentRoom
-        return activePlayers.map(v => v.id).includes(this.$socket.id)
-      }
+      ...mapGetters(['getCurrentRoom'])
     },
     mounted () {
       this.$socket.on('joined_room', (room) => {
@@ -158,7 +73,6 @@
           activePlayers,
           currentPlayer
         })
-        this.typingWord = null
       })
       this.$socket.on('player_lost_heart', ({ activePlayers }) => {
         const room = this.$store.getters.getCurrentRoom
@@ -166,22 +80,6 @@
           ...room,
           activePlayers,
         })
-      })
-      this.$socket.on('room_starting', ({ game_start_in, state }) => {
-        const room = this.$store.getters.getCurrentRoom
-        this.$store.commit('SET_ROOM', {
-          ...room,
-          state
-        })
-        this.waitingTimer = game_start_in
-        const interval = setInterval(() => {
-          this.waitingTimer -= 1000
-        }, 1000)
-
-        setTimeout(() => {
-          this.waitingTimer = null
-          clearInterval(interval)
-        }, game_start_in)
       })
       this.$socket.on('room_started', ({ state, word_to_guess, activePlayers, currentPlayer }) => {
         const room = this.$store.getters.getCurrentRoom
@@ -224,15 +122,13 @@
         })
         console.log('ROOM RESET...')
       })
-      this.$socket.on('room_type_guess_word', ({ state, currentPlayer, word }) => {
+      this.$socket.on('room_type_guess_word', ({ state, currentPlayer }) => {
         const room = this.$store.getters.getCurrentRoom
         this.$store.commit('SET_ROOM', {
           ...room,
           state,
           currentPlayer,
         })
-
-        this.typingWord = word
       })
       this.$socket.on('room_joined_game', ({ state, activePlayers }) => {
         const room = this.$store.getters.getCurrentRoom
@@ -243,25 +139,62 @@
         })
       })
     },
-    methods: {
-      joinGame () {
-        this.$socket.emit('room_join_game', {
-          id: this.getCurrentRoom.id,
-        })
-      },
-      typeWord () {
-        this.$socket.emit('type_guess_word', {
-          room: this.getCurrentRoom.id,
-          word: this.guessingWord
-        })
-      },
-      guessWord () {
-        this.$socket.emit('guess_word', {
-          room: this.getCurrentRoom.id,
-          word: this.guessingWord
-        })
-      }
+    beforeRouteLeave (to, from, next) {
+      this.$socket.emit('room_left', {
+        id: this.getCurrentRoom.id,
+      })
+
+      next()
     }
   }
 </script>
 
+<style lang="css" scoped>
+  .room {
+    display: flex;
+  }
+
+  .room__sidebar {
+    width: 340px;
+    height: 100vh;
+    background-color: #242C3B;
+    padding: 20px;
+  }
+
+  .room__sidebar__title,
+  .room__sidebar__players__title {
+    color: white;
+    font-weight: 400;
+  }
+
+  .room__sidebar__title {
+    font-size: 1.5rem;
+  }
+
+  .room__sidebar__players ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .room__sidebar__players__title {
+    font-size: 1.1rem;
+  }
+
+  .room__sidebar__players__item {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1rem;
+    margin-bottom: 8px;
+    margin-left: 16px;
+  }
+
+  .room__content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .room__content__logo {
+    margin: 0 auto 64px auto;
+  }
+</style>

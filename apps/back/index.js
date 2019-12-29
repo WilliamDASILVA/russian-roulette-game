@@ -27,6 +27,29 @@ setInterval(() => {
     })
 }, 500)
 
+function leaveRoom (socket) {
+  const playerId = players.findIndex(player => player.id === socket.id)
+  if (playerId === -1) {
+    return false
+  }
+
+  const roomId = rooms.findIndex(room => {
+    return room.players.findIndex(player => player.id === players[playerId].id) !== -1
+  })
+
+  if (roomId !== -1) {
+    rooms[roomId].removePlayer(players[playerId], () => {
+      // Self destruct
+      rooms.splice(roomId, 1)
+    })
+    console.log('leave room called??')
+  }
+
+  players.forEach(player => {
+    io.to(player.id).emit('rooms_available', rooms)
+  })
+}
+
 io.on('connection', function (socket) {
   socket.on('create_room', ({ name }) => {
     const room = new Room(name)
@@ -86,8 +109,11 @@ io.on('connection', function (socket) {
     }
   })
 
+  socket.on('room_left', () => {
+    leaveRoom(socket)
+  })
+
   socket.on('join', (username) => {
-    console.log('socket', socket.id)
     socket.emit('rooms_available', rooms)
     const player = new Player(socket.id, username)
     players.push(player)
@@ -96,16 +122,7 @@ io.on('connection', function (socket) {
   socket.on('disconnect', () => {
     const playerId = players.findIndex(player => player.id === socket.id)
     if (playerId !== -1) {
-      const roomId = rooms.findIndex(room => {
-        return room.players.findIndex(player => player.id === players[playerId].id) !== -1
-      })
-
-      if (roomId !== -1) {
-        rooms[roomId].removePlayer(players[playerId], () => {
-          // Self destruct
-          rooms.splice(roomId, 1)
-        })
-      }
+      leaveRoom(socket)
 
       players.splice(playerId, 1)
     }

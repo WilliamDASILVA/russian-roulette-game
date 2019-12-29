@@ -34,3 +34,10 @@
     }
   }
 </script>
+
+<style lang="css">
+  #app, body {
+    background-color: #2D3748;
+    min-height: 100vh;
+  }
+</style>
