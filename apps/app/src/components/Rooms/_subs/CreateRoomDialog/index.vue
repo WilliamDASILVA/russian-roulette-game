@@ -3,59 +3,81 @@
     v-if="value"
     class="create-room-dialog"
   >
-    <div class="create-room-dialog__wrapper">
-      <div class="create-room-dialog__wrapper__header">
-        <h2 class="create-room-dialog__wrapper__header__title">
-          Create a new room
-        </h2>
-        <button
-          type="button"
-          title="Close"
-          class="create-room-dialog__wrapper__header__close"
-          @click="$emit('input', false)"
-        >
-          <i class="material-icons" aria-hidden="true">close</i>
-        </button>
-      </div>
-      <form
-        @submit.prevent="createRoom"
-      >
-        <div
-          class="create-room-dialog__wrapper__content"
-        >
-          <div class="create-room-dialog__wrapper__content__field">
-            <label
-              for="name"
-              class="create-room-dialog__wrapper__content__label"
-            >
-              Room name
-            </label>
-            <input
-              v-model="roomName"
-              type="text"
-              id="name"
-              class="field"
-            >
-          </div>
-        </div>
-
-        <div class="create-room-dialog__wrapper__footer">
+    <ValidationObserver
+      ref="observer"
+      slim
+    >
+      <div class="create-room-dialog__wrapper">
+        <div class="create-room-dialog__wrapper__header">
+          <h2 class="create-room-dialog__wrapper__header__title">
+            Create a new room
+          </h2>
           <button
             type="button"
-            class="btn"
+            title="Close"
+            class="create-room-dialog__wrapper__header__close"
             @click="$emit('input', false)"
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="btn btn-primary"
-          >
-            Create room
+            <i class="material-icons" aria-hidden="true">close</i>
           </button>
         </div>
-      </form>
-    </div>
+        <form
+          @submit.prevent="createRoom"
+        >
+          <div
+            class="create-room-dialog__wrapper__content"
+          >
+            <div class="create-room-dialog__wrapper__content__field">
+              <ValidationProvider
+                v-slot="{ invalid, errors }"
+                name="room name"
+                rules="required"
+                slim
+              >
+                <label
+                  for="name"
+                  class="create-room-dialog__wrapper__content__label"
+                >
+                  Room name
+                </label>
+                <input
+                  v-model="roomName"
+                  type="text"
+                  id="name"
+                  class="field"
+                  :class="{
+                    'field--invalid': invalid && errors.length > 0
+                  }"
+                  required
+                >
+                <span
+                  v-if="invalid && errors.length > 0"
+                  class="create-room-dialog__wrapper__content__error"
+                >
+                  {{ errors[0] }}
+                </span>
+              </ValidationProvider>
+            </div>
+          </div>
+
+          <div class="create-room-dialog__wrapper__footer">
+            <button
+              type="button"
+              class="btn"
+              @click="$emit('input', false)"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+            >
+              Create room
+            </button>
+          </div>
+        </form>
+      </div>
+    </ValidationObserver>
   </div>
 </template>
 
@@ -78,9 +100,14 @@
     },
     methods: {
       createRoom () {
-        this.$socket.emit('create_room', {
-          name: this.roomName
-        })
+        this.$refs.observer.validate()
+          .then(valid => {
+            if (!valid) return false
+
+            this.$socket.emit('create_room', {
+              name: this.roomName
+            })
+          })
       }
     }
   }
@@ -138,6 +165,19 @@
     flex-direction: column;
     width: 100%;
     margin-bottom: 16px;
+  }
+
+  .create-room-dialog__wrapper__content__label {
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+
+  .create-room-dialog__wrapper__content__error {
+    display: flex;
+    color: #c53030;
+    font-size: 0.9rem;
+    margin-top: 8px;
   }
 
   .create-room-dialog__wrapper__content__label {

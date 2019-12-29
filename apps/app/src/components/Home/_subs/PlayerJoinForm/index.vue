@@ -46,7 +46,7 @@
           </button>
         </div>
         <span
-          v-if="invalid"
+          v-if="invalid && errors.username && errors.username.length > 0"
           class="player-join-form__error"
         >
           {{ errors.username[0] }}
@@ -92,7 +92,7 @@
 
   .player-join-form__wrapper {
     background-color: white;
-    padding: 16px 24px;
+    padding: 16px 24px 24px 24px;
     border-radius: 8px;
   }
 
