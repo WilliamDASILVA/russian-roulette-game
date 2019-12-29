@@ -78,7 +78,7 @@
             this.$socket.emit('join', this.formData.username)
             this.$router.push({
               name: 'Rooms'
-            })
+            }).catch(() => {})
           })
       }
     }

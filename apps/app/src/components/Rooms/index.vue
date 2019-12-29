@@ -94,7 +94,7 @@
           params: {
             id
           }
-        })
+        }).catch(() => {})
       })
     },
     beforeRouteLeave (to, from, next) {
