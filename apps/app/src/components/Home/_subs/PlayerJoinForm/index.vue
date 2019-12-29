@@ -1,34 +1,53 @@
 <template>
   <div class="player-join-form">
-    <form
-      @submit.prevent="submitted"
+    <ValidationObserver
+      ref="observer"
+      v-slot="{ invalid, errors }"
+      slim
     >
-      <div
-        class="player-join-form__label-container"
+      <form
+        @submit.prevent="submitted"
       >
-        <label
-          for="name"
-          class="player-join-form__label"
+        <div
+          class="player-join-form__label-container"
         >
-          Your username
-        </label>
-      </div>
-      <div class="player-join-form__fields">
-        <input
-          v-model="formData.username"
-          id="name"
-          type="text"
-          class="field"
-        >
+          <label
+            for="name"
+            class="player-join-form__label"
+          >
+            Your username
+          </label>
+        </div>
+        <div class="player-join-form__fields">
+          <ValidationProvider
+            name="username"
+            rules="required"
+            class="player-join-form__fields__field"
+          >
+            <input
+              v-model="formData.username"
+              id="name"
+              type="text"
+              class="field"
+              required
+            >
+          </ValidationProvider>
 
-        <button
-          type="submit"
-          class="btn btn-primary player-join-form__button"
+          <button
+            type="submit"
+            class="btn btn-primary player-join-form__button"
+          >
+            Join
+          </button>
+        </div>
+        <span
+          v-if="invalid"
+          class="player-join-form__error"
         >
-          Join
-        </button>
-      </div>
-    </form>
+          {{ errors.username[0] }}
+        </span>
+      </form>
+    </ValidationObserver>
   </div>
 </template>
 
@@ -47,10 +66,15 @@
     },
     methods: {
       submitted () {
-        this.$socket.emit('join', this.formData.username)
-        this.$router.push({
-          name: 'Rooms'
-        })
+        this.$refs.observer.validate()
+          .then(valid => {
+            if (!valid) return false
+
+            this.$socket.emit('join', this.formData.username)
+            this.$router.push({
+              name: 'Rooms'
+            })
+          })
       }
     }
   }
@@ -66,6 +90,13 @@
     font-size: 1rem;
   }
 
+  .player-join-form__error {
+    display: flex;
+    color: #D53F8C;
+    font-size: 0.8rem;
+    margin-top: 8px;
+  }
+
   .player-join-form__fields {
     display: flex;
   }
@@ -73,6 +104,11 @@
   .player-join-form__fields .field {
     margin-right: 8px;
     min-width: 200px;
+  }
+
+  .player-join-form__fields__field {
+    display: flex;
+    flex-direction: column;
   }
 
   .player-join-form__button {
