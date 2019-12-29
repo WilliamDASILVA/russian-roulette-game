@@ -9,7 +9,7 @@ import './plugins'
 
 import '@/assets/css/main.css'
 
-import env from '@/../env.json'
+import env from '@/env.json'
 
 Vue.config.productionTip = false
 

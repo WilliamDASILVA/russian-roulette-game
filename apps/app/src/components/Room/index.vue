@@ -41,7 +41,7 @@
   import axios from 'axios'
   import { mapGetters } from 'vuex'
 
-  import env from '@/../env.json'
+  import env from '@/env.json'
   import RoomGame from './_subs/RoomGame'
 
   /**

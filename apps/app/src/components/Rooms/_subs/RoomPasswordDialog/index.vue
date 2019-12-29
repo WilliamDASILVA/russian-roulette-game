@@ -87,7 +87,7 @@
 
 <script>
   import axios from 'axios'
-  import env from '@/../env.json'
+  import env from '@/env.json'
 
   /**
    * @module component - RoomPasswordDialog
