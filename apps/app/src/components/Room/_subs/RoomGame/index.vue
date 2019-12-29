@@ -45,8 +45,9 @@
 
       <div class="room-game__circle__players">
         <RoomGamePlayer
-          v-for="(player, k) in players"
-          :key="k"
+          v-for="player in players"
+          :key="player.id"
+          :index="player.id"
           :name="player.name"
           :hearts="player.heart"
           :typing="player.typing"
@@ -163,19 +164,10 @@
         return activePlayers.filter(player => player.heart > 0)[0]
       },
       arrowRotation () {
-        const { activePlayers, currentPlayer } = this.getCurrentRoom
-        const playerIndex = activePlayers.findIndex(player => player.id === currentPlayer.id)
+        const { currentPlayer } = this.getCurrentRoom
+        const playerIndex = this.players.findIndex(player => player.id === currentPlayer.id)
 
-        // 180 => 360
-        // 540 => 720
-
-        // 180 + 0 + 0 => 180 => 0r
-        // 180 + 0 + 180 => 360 => 0.5r
-        // 180 + 180 + 180 => 540 => 1
-        // 180 + 540 + 0 => 720 => 1.5
-        // 180 + 540 + 180 => 900 => 2
-        // 180 + 900 + 0 => 1080 2.5
-        return ((360 / activePlayers.length) * playerIndex)
+        return 180 + ((360 / this.players.length) * playerIndex)
       },
       computedLetters () {
         const { activePlayers } = this.getCurrentRoom
@@ -203,8 +195,8 @@
             ...player,
             typing: currentPlayer && currentPlayer.id === player.id ? this.typingWord : null,
             position: {
-              left: `${((Math.cos((k * angle) + angle)).toFixed(2) * 250) - 70}px`,
-              top: `${((Math.sin((k * angle) + angle)).toFixed(2) * 250) - 33}px`
+              left: `${((Math.cos(k * angle)).toFixed(2) * 250) - 70}px`,
+              top: `${((Math.sin(k * angle)).toFixed(2) * 250) - 33}px`
             }
           }
         })
