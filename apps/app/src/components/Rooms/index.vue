@@ -41,7 +41,7 @@
                 {{ room.name }}
               </div>
               <div class="rooms__list__item__player-count">
-                3 players
+                {{ room.players.length }} players
               </div>
             </router-link>
           </li>
