@@ -12,8 +12,9 @@ services:
       - 3001:3001
   app:
     build: apps/app
-    command: npm run dev
+    command: bash -c "VUE_APP_API_ENDPOINT=http://localhost:3000 npm run dev"
     environment:
+      - VUE_APP_API_ENDPOINT=http://localhost:3000
       - PORT=8080
     volumes:
       - ./apps/app:/app

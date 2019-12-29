@@ -9,11 +9,9 @@ import './plugins'
 
 import '@/assets/css/main.css'
 
-import env from '@/env.json'
-
 Vue.config.productionTip = false
 
-const socket = io(env['api-endpoint'])
+const socket = io(process.env.VUE_APP_API_ENDPOINT)
 Vue.prototype.$socket = socket
 Vue.socket = socket
 
