@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vue-cli-service serve",
-    "start": "serve dist -l 80",
+    "start": "./node_modules/serve/bin/serve.js dist -l tcp://0.0.0.0:80",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },

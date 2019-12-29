@@ -17,6 +17,5 @@ services:
       - PORT=80
     volumes:
       - ./apps/app:/app
-      - /app/node_modules
     ports:
       - 80:80
