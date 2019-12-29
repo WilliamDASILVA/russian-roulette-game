@@ -1,33 +1,38 @@
 <template>
   <div class="room">
-    <div class="room__sidebar">
-      <h1 class="room__sidebar__title">
-        {{ getCurrentRoom.name }}
-      </h1>
-      <div class="room__sidebar__players">
-        <h2 class="room__sidebar__players__title">
-          Players
-        </h2>
-        <ul>
-          <li
-            v-for="player in getCurrentRoom.players"
-            :key="player.id"
-            class="room__sidebar__players__item"
-          >
-            {{ player.name }}
-          </li>
-        </ul>
+    <template v-if="getCurrentRoom">
+      <div class="room__sidebar">
+        <h1 class="room__sidebar__title">
+          {{ getCurrentRoom.name }}
+        </h1>
+        <div class="room__sidebar__players">
+          <h2 class="room__sidebar__players__title">
+            Players
+          </h2>
+          <ul>
+            <li
+              v-for="player in getCurrentRoom.players"
+              :key="player.id"
+              class="room__sidebar__players__item"
+            >
+              {{ player.name }}
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
-    <div class="room__content">
-      <img
-        class="room__content__logo"
-        src="@/assets/img/logo.png"
-        alt="Bombparty Clone"
-      >
+      <div class="room__content">
+        <img
+          class="room__content__logo"
+          src="@/assets/img/logo.png"
+          alt="Bombparty Clone"
+        >
 
-      <RoomGame />
-    </div>
+        <RoomGame />
+      </div>
+    </template>
+    <template v-else>
+      Loading...
+    </template>
   </div>
 </template>
 

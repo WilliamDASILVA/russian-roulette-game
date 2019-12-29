@@ -100,9 +100,7 @@
     beforeRouteLeave (to, from, next) {
       const routes = ['Home']
       if (routes.includes(to.name)) {
-        this.$socket.emit('disconnect', {
-          id: this.getCurrentRoom.id,
-        })
+        this.$socket.emit('disconnect')
       }
       next()
     }
