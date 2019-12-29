@@ -306,6 +306,7 @@
     right: 0;
     width: 200px;
     margin: auto;
+    z-index: 10;
   }
 
   .room-game__message__title {
