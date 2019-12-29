@@ -4,7 +4,7 @@ set :deploy_to, '/var/www/bombparty'
 
 set :repo_url, "git@github.com:WilliamDASILVA/bombparty.git"
 
-set :linked_dirs, %w{ apps/app/env.json }
+set :linked_files, %w{ apps/app/env.json }
 
 role :server, %w{root@178.62.12.76}
 
