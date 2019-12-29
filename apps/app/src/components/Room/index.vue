@@ -37,7 +37,8 @@
 </template>
 
 <script>
-  import Vue from 'vue'
+  import store from '@/store'
+  import axios from 'axios'
   import { mapGetters } from 'vuex'
 
   import RoomGame from './_subs/RoomGame'
@@ -51,11 +52,27 @@
       RoomGame
     },
     beforeRouteEnter (to, from, next) {
-      Vue.socket.emit('room_join', {
-        id: to.params.id
-      })
+      const username = store.getters.getUsername
+      if (!username) {
+        next({
+          name: 'Home'
+        })
 
-      next()
+        return false
+      }
+
+      axios.get(`http://localhost:3000/rooms/${to.params.id}`)
+        .then(response => {
+          if (response.status === 200) {
+            store.commit('SET_ROOM', response.data)
+            next()
+          }
+        })
+        .catch(() => {
+          next({
+            name: 'Rooms'
+          })
+        })
     },
     computed: {
       ...mapGetters(['getCurrentRoom'])

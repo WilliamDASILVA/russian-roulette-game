@@ -16,10 +16,11 @@ const words_dictionnary = words
 const GAME_TIMER = 5
 
 module.exports = class Room {
-  constructor (name) {
+  constructor (name, password) {
     this.id = uuid()
     this.state = 'created'
     this.name = name
+    this.password = password
 
     this.players = []
     this.activePlayers = []

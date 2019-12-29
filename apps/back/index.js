@@ -1,5 +1,5 @@
 const uuid = require('uuid/v4')
-const { io } = require('./server')
+const { io, app } = require('./server')
 const Room = require('./room')
 const Player = require('./player')
 
@@ -27,6 +27,15 @@ setInterval(() => {
     })
 }, 500)
 
+function formatRooms ({ id, name, password, players }) {
+  return {
+    id,
+    name,
+    hasPassword: !!password,
+    players
+  }
+}
+
 function leaveRoom (socket) {
   const playerId = players.findIndex(player => player.id === socket.id)
   if (playerId === -1) {
@@ -46,24 +55,11 @@ function leaveRoom (socket) {
   }
 
   players.forEach(player => {
-    io.to(player.id).emit('rooms_available', rooms)
+    io.to(player.id).emit('rooms_available', rooms.map(formatRooms))
   })
 }
 
 io.on('connection', function (socket) {
-  socket.on('create_room', ({ name }) => {
-    const room = new Room(name)
-    rooms.push(room)
-
-    players.forEach((player) => {
-      io.to(player.id).emit('rooms_available', rooms)
-    })
-
-    socket.emit('room_created', {
-      id: room.id
-    })
-  })
-
   socket.on('guess_word', ({ room: id, word }) => {
     const roomsId = rooms.findIndex(room => room.id === id)
     if (roomsId !== -1) {
@@ -81,7 +77,6 @@ io.on('connection', function (socket) {
   })
 
   socket.on('room_join', ({ id }) => {
-    console.log('JOIN ROOM', id)
     const roomsId = rooms.findIndex(room => room.id === id)
     if (roomsId !== -1) {
       console.log('room?', roomsId)
@@ -114,7 +109,8 @@ io.on('connection', function (socket) {
   })
 
   socket.on('join', (username) => {
-    socket.emit('rooms_available', rooms)
+    socket.emit('rooms_available', rooms.map(formatRooms))
+
     const player = new Player(socket.id, username)
     players.push(player)
   })
@@ -127,4 +123,54 @@ io.on('connection', function (socket) {
       players.splice(playerId, 1)
     }
   })
+})
+
+app.get('/rooms/:id', (req, res) => {
+  const { id } = req.params
+
+  const roomsId = rooms.findIndex(room => room.id === id)
+  if (roomsId !== -1) {
+    const room = Object.assign({}, rooms[roomsId])
+    delete room.password
+    // TODO: Filter data sent to the response
+
+    res.status(200).send(room)
+  } else {
+    res.status(404).send({})
+  }
+})
+
+app.post('/rooms/:id/join', (req, res) => {
+  const { id } = req.params
+  const { password } = req.body
+
+  const roomsId = rooms.findIndex(room => room.id === id)
+  if (roomsId !== -1) {
+    const room = rooms[roomsId]
+    if (!!room.password && room.password !== password) {
+      res.status(401).send({
+        error: 'Wrong password'
+      })
+      return false
+    }
+
+    res.status(200).send({
+      success: 'OK'
+    })
+  } else {
+    res.status(404).send({})
+  }
+})
+
+app.post('/rooms', (req, res) => {
+  const { name, password } = req.body
+
+  const room = new Room(name, password)
+  rooms.push(room)
+
+  players.forEach((player) => {
+    io.to(player.id).emit('rooms_available', rooms.map(formatRooms))
+  })
+
+  res.status(201).send(room)
 })

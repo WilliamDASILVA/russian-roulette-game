@@ -28,14 +28,9 @@
             v-for="room in getRooms"
             :key="room.id"
           >
-            <router-link
-              :to="{
-                name: 'Room',
-                params: {
-                  id: room.id
-                }
-              }"
+            <button
               class="rooms__list__item"
+              @click="joinRoom(room)"
             >
               <div class="rooms__list__item__name">
                 {{ room.name }}
@@ -43,7 +38,12 @@
               <div class="rooms__list__item__player-count">
                 {{ room.players.length }} players
               </div>
-            </router-link>
+              <i
+                v-if="room.hasPassword"
+                class="rooms__list__item__lock material-icons"
+                aria-hidden="true"
+              >lock</i>
+            </button>
           </li>
         </ul>
       </template>
@@ -56,14 +56,21 @@
       <CreateRoomDialog
         v-model="isCreateRoomOpen"
       />
+
+      <RoomPasswordDialog
+        v-model="passwordDialog.visible"
+        :room="passwordDialog.room"
+      />
     </div>
   </div>
 </template>
 
 <script>
+  import store from '@/store'
   import { mapGetters } from 'vuex'
 
   import CreateRoomDialog from './_subs/CreateRoomDialog'
+  import RoomPasswordDialog from './_subs/RoomPasswordDialog'
 
   /**
    * @module component - rooms
@@ -71,11 +78,16 @@
   export default {
     name: 'rooms',
     components: {
-      CreateRoomDialog
+      CreateRoomDialog,
+      RoomPasswordDialog
     },
     data () {
       return {
-        isCreateRoomOpen: false
+        isCreateRoomOpen: false,
+        passwordDialog: {
+          visible: false,
+          room: null
+        }
       }
     },
     computed: {
@@ -84,18 +96,43 @@
       ])
     },
     mounted () {
+      this.$socket.on('joined_room', (room) => {
+        this.$store.commit('SET_ROOM', room)
+      })
       this.$socket.on('rooms_available', (rooms) => {
-        console.log('rooms', rooms)
         this.$store.commit('SET_ROOMS', rooms)
       })
-      this.$socket.on('room_created', ({ id }) => {
-        this.$router.push({
-          name: 'Room',
-          params: {
-            id
-          }
-        }).catch(() => {})
-      })
+    },
+    methods: {
+      joinRoom (room) {
+        if (room.hasPassword) {
+          this.passwordDialog.visible = true
+          this.passwordDialog.room = room
+        } else {
+          this.$socket.emit('room_join', {
+            id: room.id
+          })
+
+          this.$router.push({
+            name: 'Room',
+            params: {
+              id: room.id
+            }
+          })
+        }
+      }
+    },
+    beforeRouteEnter (to, from, next) {
+      const username = store.getters.getUsername
+      if (!username) {
+        next({
+          name: 'Home'
+        })
+
+        return false
+      }
+
+      next()
     },
     beforeRouteLeave (to, from, next) {
       const routes = ['Home']
@@ -148,6 +185,7 @@
   }
 
   .rooms__list__item {
+    position: relative;
     display: flex;
     flex-direction: column;
 
@@ -157,6 +195,7 @@
     text-decoration: none;
     border-radius: 4px;
     min-width: 100%;
+    border: none;
 
     transition: background-color 100ms;
   }
@@ -169,6 +208,12 @@
   .rooms__list__item__player-count {
     font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.7);
+  }
+
+  .rooms__list__item__lock {
+    position: absolute;
+    right: 16px;
+    opacity: 0.7;
   }
 
   .rooms__list__item:hover {

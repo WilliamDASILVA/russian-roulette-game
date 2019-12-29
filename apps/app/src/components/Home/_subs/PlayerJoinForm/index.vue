@@ -75,6 +75,8 @@
           .then(valid => {
             if (!valid) return false
 
+            this.$store.commit('SET_USERNAME', this.formData.username)
+
             this.$socket.emit('join', this.formData.username)
             this.$router.push({
               name: 'Rooms'

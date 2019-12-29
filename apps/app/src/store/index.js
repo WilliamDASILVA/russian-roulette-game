@@ -6,7 +6,8 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     rooms: [],
-    room: null
+    room: null,
+    username: null
   },
   mutations: {
     SET_ROOMS (state, rooms) {
@@ -14,6 +15,9 @@ const store = new Vuex.Store({
     },
     SET_ROOM (state, room) {
       state.room = room
+    },
+    SET_USERNAME (state, username) {
+      state.username = username
     }
   },
   getters: {
@@ -22,6 +26,9 @@ const store = new Vuex.Store({
     },
     getCurrentRoom (state) {
       return state.room
+    },
+    getUsername (state) {
+      return state.username
     }
   }
 })
