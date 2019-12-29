@@ -91,10 +91,11 @@ module.exports = class Room {
       }, GAME_START_IN)
     }
 
-    io.to(player.id).emit('room_joined_game', {
-      state: this.state,
-      activePlayers: this.activePlayers
-    })
+    io.to(this.id)
+      .emit('room_joined_game', {
+        state: this.state,
+        activePlayers: this.activePlayers
+      })
   }
 
   startGame () {
