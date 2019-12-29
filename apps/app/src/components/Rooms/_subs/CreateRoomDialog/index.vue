@@ -136,7 +136,7 @@
           .then(valid => {
             if (!valid) return false
 
-            axios.post(`http://localhost:3000/rooms`, {
+            axios.post(`http://0.0.0.0:3000/rooms`, {
               name: this.roomName,
               password: this.roomPassword
             })

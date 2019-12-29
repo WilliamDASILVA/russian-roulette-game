@@ -61,7 +61,7 @@
         return false
       }
 
-      axios.get(`http://localhost:3000/rooms/${to.params.id}`)
+      axios.get(`http://0.0.0.0:3000/rooms/${to.params.id}`)
         .then(response => {
           if (response.status === 200) {
             store.commit('SET_ROOM', response.data)

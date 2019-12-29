@@ -116,7 +116,7 @@
             if (!valid) return false
             this.error = null
 
-            axios.post(`http://localhost:3000/rooms/${this.room.id}/join`, {
+            axios.post(`http://0.0.0.0:3000/rooms/${this.room.id}/join`, {
               password: this.roomPassword
             })
               .then(response => {
