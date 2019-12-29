@@ -112,6 +112,7 @@
 
 <script>
   import axios from 'axios'
+  import env from '@/../env.json'
 
   /**
    * @module component - CreateRoomDialog
@@ -136,7 +137,7 @@
           .then(valid => {
             if (!valid) return false
 
-            axios.post(`http://0.0.0.0:3000/rooms`, {
+            axios.post(`${env['api-endpoint']}/rooms`, {
               name: this.roomName,
               password: this.roomPassword
             })

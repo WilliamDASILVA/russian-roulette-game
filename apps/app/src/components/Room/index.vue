@@ -41,6 +41,7 @@
   import axios from 'axios'
   import { mapGetters } from 'vuex'
 
+  import env from '@/../env.json'
   import RoomGame from './_subs/RoomGame'
 
   /**
@@ -61,7 +62,7 @@
         return false
       }
 
-      axios.get(`http://0.0.0.0:3000/rooms/${to.params.id}`)
+      axios.get(`${env['api-endpoint']}/rooms/${to.params.id}`)
         .then(response => {
           if (response.status === 200) {
             store.commit('SET_ROOM', response.data)

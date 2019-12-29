@@ -87,6 +87,7 @@
 
 <script>
   import axios from 'axios'
+  import env from '@/../env.json'
 
   /**
    * @module component - RoomPasswordDialog
@@ -116,7 +117,7 @@
             if (!valid) return false
             this.error = null
 
-            axios.post(`http://0.0.0.0:3000/rooms/${this.room.id}/join`, {
+            axios.post(`${env['api-endpoint']}/rooms/${this.room.id}/join`, {
               password: this.roomPassword
             })
               .then(response => {
