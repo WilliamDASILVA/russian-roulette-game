@@ -76,8 +76,10 @@ module.exports = class Room {
     const playerIndex = this.activePlayers.findIndex(p => p.id === player.id)
     if (playerIndex !== -1) return false
 
+    const disabledStates = ['started', 'finished']
+    if (disabledStates.includes(this.state)) return false
+
     this.activePlayers.push(player)
-    console.log('player joined room?', player)
 
     if (this.activePlayers.length >= 2) {
       if (this.state === 'starting') {
