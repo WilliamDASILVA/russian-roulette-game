@@ -62,7 +62,16 @@
         />
       </div>
 
-      <div class="room-game__circle__center" />
+      <div
+        class="room-game__circle__center"
+      >
+        <div
+          class="room-game__circle__center__inner"
+          :style="{
+            'transform': `scale(${dotScale})`
+          }"
+        ></div>
+      </div>
       <div
         v-if="getCurrentRoom.state === 'started'"
         class="room-game__circle__arrow"
@@ -129,7 +138,8 @@
         guessingWord: null,
         typingWord: null,
         waitingTimer: null,
-        totalRotations: 0
+        totalRotations: 0,
+        dotScale: 0
       }
     },
     mounted () {
@@ -156,6 +166,10 @@
       })
       this.$socket.on('room_type_guess_word', ({ word }) => {
         this.typingWord = word
+      })
+      this.$socket.on('room_tick', ({ timer }) => {
+        const percent = ((timer - Date.now()) * 100) / 5000
+        this.dotScale = Math.ceil(100 - percent) / 100
       })
     },
     computed: {
@@ -255,12 +269,26 @@
     bottom: 0;
     left: 0;
     right: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 32px;
+    width: 54px;
+    height: 54px;
+    border-radius: 54px;
     margin: auto;
-    background-color: #434C5B;
+    border: 1px solid #434C5B;
   }
+
+  .room-game__circle__center__inner {
+    position: absolute;
+    content: '';
+    left: 0px;
+    top: 0px;
+    width: 52px;
+    height: 52px;
+    border-radius: 54px;
+    background: #434C5B;
+    transition: transform 200ms;
+    transform: scale(1);
+  }
+
 
   .room-game__circle__arrow {
     position: absolute;
@@ -291,18 +319,8 @@
     top: 9px;
     width: 250px;
     height: 10px;
+    border-radius: 0 4px 4px 0;
     background-color: #434C5B;
-  }
-
-  .room-game__circle__center::after {
-    position: absolute;
-    content: '';
-    left: -12px;
-    top: -12px;
-    width: 54px;
-    height: 54px;
-    border-radius: 54px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
   }
 
   .room-game__message {

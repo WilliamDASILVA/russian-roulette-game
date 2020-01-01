@@ -24,6 +24,11 @@ setInterval(() => {
           room.nextPlayer()
         }
       }
+
+      io.to(room.id).emit('room_tick', {
+        timer: room.timer,
+        state: room.state
+      })
     })
 }, 500)
 
