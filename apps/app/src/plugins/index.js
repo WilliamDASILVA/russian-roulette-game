@@ -1,1 +1,2 @@
 import './VeeValidate'
+import './VueWait'
