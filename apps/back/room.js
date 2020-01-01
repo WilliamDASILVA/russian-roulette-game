@@ -1,16 +1,8 @@
 const uuid = require('uuid/v4')
 const { io } = require('./server')
-const { words } = require('./dictionnary')
+const { words, letters } = require('./dictionnary')
 
-const letters_dictionnary = [
-  'ER',
-  'YA',
-  'RE',
-  'ION',
-  'ENT',
-  'CA'
-]
-
+const letters_dictionnary = letters
 const words_dictionnary = words
 
 const GAME_TIMER = 5
