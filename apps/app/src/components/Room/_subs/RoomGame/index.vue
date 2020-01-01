@@ -37,6 +37,7 @@
           v-if="(getCurrentRoom.state === 'starting' || getCurrentRoom.state === 'created') && !hasJoinedGame"
           type="button"
           class="btn btn-primary"
+          :disabled="$wait.is('joining game')"
           @click="joinGame"
         >
           Join game
@@ -209,8 +210,11 @@
     },
     methods: {
       joinGame () {
+        this.$wait.start('joining game')
         this.$socket.emit('room_join_game', {
           id: this.getCurrentRoom.id,
+        }, () => {
+          this.$wait.end('joining game')
         })
       },
       typeWord () {

@@ -94,12 +94,12 @@ io.on('connection', function (socket) {
     }
   })
 
-  socket.on('room_join_game', ({ id }) => {
+  socket.on('room_join_game', ({ id }, fn) => {
     const roomsId = rooms.findIndex(room => room.id === id)
     if (roomsId !== -1) {
       const playerId = players.findIndex(player => player.id === socket.id)
       if (playerId !== -1) {
-        rooms[roomsId].joinGame(players[playerId])
+        rooms[roomsId].joinGame(players[playerId], fn)
       }
     }
   })

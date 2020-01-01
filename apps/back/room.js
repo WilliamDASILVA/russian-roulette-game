@@ -72,8 +72,8 @@ module.exports = class Room {
     return this.activePlayers.filter(player => player.heart > 0)
   }
 
-  joinGame (player) {
-    const playerIndex = this.activePlayers.findIndex(p => p.id === player)
+  joinGame (player, cb) {
+    const playerIndex = this.activePlayers.findIndex(p => p.id === player.id)
     if (playerIndex !== -1) return false
 
     this.activePlayers.push(player)
@@ -102,6 +102,7 @@ module.exports = class Room {
         state: this.state,
         activePlayers: this.activePlayers
       })
+    cb()
   }
 
   startGame () {
