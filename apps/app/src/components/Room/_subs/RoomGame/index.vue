@@ -318,6 +318,7 @@
     position: absolute;
     width: 0;
     height: 0;
+    left: 119px;
     border-style: solid;
     border-width: 14px 16px 14px 0;
     border-color: transparent #434C5B transparent transparent;
@@ -326,11 +327,11 @@
   .room-game__circle__arrow::after {
     content: '';
     position: absolute;
-    left: 16px;
+    left: 135px;
     top: 9px;
-    width: 250px;
+    width: 120px;
     height: 10px;
-    border-radius: 0 4px 4px 0;
+    border-radius: 0 9px 9px 0;
     background-color: #434C5B;
   }
 
