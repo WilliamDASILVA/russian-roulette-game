@@ -82,21 +82,19 @@ module.exports = class Room {
     this.activePlayers.push(player)
 
     if (this.activePlayers.length >= 2) {
-      if (this.state === 'starting') {
-        return false
+      if (this.state !== 'starting') {
+        this.state = 'starting'
+        const GAME_START_AT = Date.now() + 5000
+  
+        io.to(this.id).emit('room_starting', {
+          state: this.state,
+          game_start_at: GAME_START_AT
+        })
+  
+        setTimeout(() => {
+          this.startGame()
+        }, 5000)
       }
-
-      this.state = 'starting'
-      const GAME_START_AT = Date.now() + 5000
-
-      io.to(this.id).emit('room_starting', {
-        state: this.state,
-        game_start_at: GAME_START_AT
-      })
-
-      setTimeout(() => {
-        this.startGame()
-      }, 5000)
     }
 
     io.to(this.id)
