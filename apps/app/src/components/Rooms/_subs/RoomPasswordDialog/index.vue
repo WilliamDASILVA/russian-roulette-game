@@ -22,6 +22,7 @@
           </button>
         </div>
         <form
+          :disabled="$wait.is('creating room')"
           @submit.prevent="submitted"
         >
           <div
@@ -75,6 +76,7 @@
             <button
               type="submit"
               class="btn btn-primary"
+              :disabled="$wait.is('creating room')"
             >
               Join room
             </button>
@@ -116,24 +118,33 @@
             if (!valid) return false
             this.error = null
 
+            if (this.$wait.is('joining room with password')) return false
+
+            this.$wait.start('joining room with password')
             axios.post(`${process.env.VUE_APP_API_ENDPOINT}/rooms/${this.room.id}/join`, {
               password: this.roomPassword
             })
               .then(response => {
                 if (response.status === 200) {
+                  this.$wait.start('joining room')
                   this.$socket.emit('room_join', {
                     id: this.room.id
-                  })
-                  this.$router.push({
-                    name: 'Room',
-                    params: {
-                      id: this.room.id
-                    }
+                  }, () => {
+                    this.$wait.end('joining room')
+                    this.$router.push({
+                      name: 'Room',
+                      params: {
+                        id: this.room.id
+                      }
+                    })
                   })
                 }
               })
               .catch(() => {
                 this.error = 'Wrong password'
+              })
+              .finally(() => {
+                this.$wait.end('joining room with password')
               })
           })
       }

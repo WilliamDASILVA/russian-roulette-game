@@ -22,6 +22,7 @@
           </button>
         </div>
         <form
+          :disabled="$wait.is('creating room')"
           @submit.prevent="createRoom"
         >
           <div
@@ -100,6 +101,7 @@
             <button
               type="submit"
               class="btn btn-primary"
+              :disabled="$wait.is('creating room')"
             >
               Create room
             </button>
@@ -136,6 +138,9 @@
           .then(valid => {
             if (!valid) return false
 
+            if (this.$wait.is('creating room')) return false
+
+            this.$wait.start('creating room')
             axios.post(`${process.env.VUE_APP_API_ENDPOINT}/rooms`, {
               name: this.roomName,
               password: this.roomPassword
@@ -144,17 +149,22 @@
                 if (response.status === 201) {
                   const room = response.data
 
+                  this.$wait.start('joining room')
                   this.$socket.emit('room_join', {
                     id: room.id
-                  })
-
-                  this.$router.push({
-                    name: 'Room',
-                    params: {
-                      id: room.id
-                    }
+                  }, () => {
+                    this.$wait.end('joining room')
+                    this.$router.push({
+                      name: 'Room',
+                      params: {
+                        id: room.id
+                      }
+                    })
                   })
                 }
+              })
+              .finally(() => {
+                this.$wait.end('creating room')
               })
           })
       }

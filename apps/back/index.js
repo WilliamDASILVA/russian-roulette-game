@@ -76,7 +76,7 @@ io.on('connection', function (socket) {
     }
   })
 
-  socket.on('room_join', ({ id }) => {
+  socket.on('room_join', ({ id }, fn) => {
     const roomsId = rooms.findIndex(room => room.id === id)
     if (roomsId !== -1) {
       console.log('room?', roomsId)
@@ -90,6 +90,7 @@ io.on('connection', function (socket) {
         console.log('rooms?', socket.rooms)
 
         io.to(rooms[roomsId].id).emit('player_joined_room', rooms[roomsId])
+        fn()
       }
     }
   })

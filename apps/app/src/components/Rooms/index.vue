@@ -30,6 +30,7 @@
           >
             <button
               class="rooms__list__item"
+              :disabled="$wait.is('joining room')"
               @click="joinRoom(room)"
             >
               <div class="rooms__list__item__name">
@@ -105,19 +106,23 @@
     },
     methods: {
       joinRoom (room) {
+        if (this.$wait.is('joining room')) return false
+
         if (room.hasPassword) {
           this.passwordDialog.visible = true
           this.passwordDialog.room = room
         } else {
+          this.$wait.start('joining room')
           this.$socket.emit('room_join', {
             id: room.id
-          })
-
-          this.$router.push({
-            name: 'Room',
-            params: {
-              id: room.id
-            }
+          }, () => {
+            this.$wait.end('joining room')
+            this.$router.push({
+              name: 'Room',
+              params: {
+                id: room.id
+              }
+            })
           })
         }
       }
