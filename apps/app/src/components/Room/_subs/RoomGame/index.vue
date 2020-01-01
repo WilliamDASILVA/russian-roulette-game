@@ -171,12 +171,17 @@
       },
       computedLetters () {
         const { activePlayers } = this.getCurrentRoom
-        const player = activePlayers.find(player => player.id === this.$socket.id)
+        const playerIndex = activePlayers.findIndex(player => player.id === this.$socket.id)
+        
+        if (playerIndex === -1) {
+          return []
+        }
 
-        return LETTERS_TO_USE.map(letter => ({
-          isUsed: !player.lettersToUse.includes(letter),
-          letter
-        }))
+        return LETTERS_TO_USE
+          .map(letter => ({
+            isUsed: !activePlayers[playerIndex].lettersToUse.includes(letter),
+            letter
+          }))
       },
       hasJoinedGame () {
         const { activePlayers } = this.getCurrentRoom
