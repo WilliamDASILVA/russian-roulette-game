@@ -91,6 +91,7 @@
           Your word
         </label>
         <input
+          ref="guess-word"
           v-model="guessingWord"
           type="text"
           name="word"
@@ -140,6 +141,16 @@
         waitingTimer: null,
         totalRotations: 0,
         dotScale: 0
+      }
+    },
+    watch: {
+      async isPlaying (v) {
+        if (v) {
+          await this.$nextTick()
+          if (this.$refs['guess-word']) {
+            this.$refs['guess-word'].focus()
+          }
+        }
       }
     },
     mounted () {

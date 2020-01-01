@@ -20,7 +20,7 @@ TODO: Définir un dictionnaire de mots possibles
 
 RETOURS PREMIER TEST LIVE:
 
-- Autofocus le champ quand c'est au tour du joueur
+<!-- - Autofocus le champ quand c'est au tour du joueur -->
 - Saisie du joueur A, saisie apparu sur le joueur B
 - Jack avait une seule vie en joignant la partie
 - Rajouter un lien pour revenir aux rooms / home
@@ -37,8 +37,8 @@ RETOURS PREMIER TEST LIVE:
     at a.r (vue.runtime.esm.js:4066)
     at nr.get (vue.runtime.esm.js:4479) -->
 
-- Eviter aux joueurs de double, triple ou N cliquer, MERCI GYUkk
-- Empecher les joueurs de join une game si elle est "started"
-- Joueur A perds une vie, joueur B aussi (cf problème dessus)
-- Ajouter une indication sur le temps qu'il reste sur la saisie
-  - Remplir le cercle au centre pour l'indication
+<!-- - Eviter aux joueurs de double, triple ou N cliquer, MERCI GYUkk -->
+<!-- - Empecher les joueurs de join une game si elle est "started" -->
+<!-- - Joueur A perds une vie, joueur B aussi (cf problème dessus) -->
+<!-- - Ajouter une indication sur le temps qu'il reste sur la saisie
+  - Remplir le cercle au centre pour l'indication -->
