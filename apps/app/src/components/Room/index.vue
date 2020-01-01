@@ -2,9 +2,24 @@
   <div class="room">
     <template v-if="getCurrentRoom">
       <div class="room__sidebar">
-        <h1 class="room__sidebar__title">
-          {{ getCurrentRoom.name }}
-        </h1>
+        <div class="room__sidebar__header">
+          <router-link
+            :to="{
+              name: 'Rooms'
+            }"
+            class="room__sidebar__header__back"
+          >
+            <i class="material-icons" aria-hidden="true">keyboard_arrow_left</i> Back to rooms
+          </router-link>
+        </div>
+        <div class="room__sidebar__title__container">
+          <div class="room__sidebar__title-subtitle">
+            Room
+          </div>
+          <h1 class="room__sidebar__title">
+            {{ getCurrentRoom.name }}
+          </h1>
+        </div>
         <div class="room__sidebar__players">
           <h2 class="room__sidebar__players__title">
             Players
@@ -183,10 +198,41 @@
     padding: 20px;
   }
 
+  .room__sidebar__header {
+    border-bottom: 1px solid #2E394D;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+
+  .room__sidebar__header__back {
+    display: flex;
+    align-items: center;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    height: 50px;
+  }
+
+  .room__sidebar__header__back:hover {
+    color: white;
+  }
+
   .room__sidebar__title,
   .room__sidebar__players__title {
     color: white;
     font-weight: 400;
+  }
+
+  .room__sidebar__title__container {
+    margin-bottom: 24px;
+  }
+
+  .room__sidebar__title {
+    margin: 0;
+  }
+
+  .room__sidebar__title-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
   }
 
   .room__sidebar__title {
@@ -207,7 +253,7 @@
     color: rgba(255, 255, 255, 0.7);
     font-size: 1rem;
     margin-bottom: 8px;
-    margin-left: 16px;
+    margin-left: 8px;
   }
 
   .room__content {
