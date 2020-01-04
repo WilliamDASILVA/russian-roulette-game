@@ -2,7 +2,7 @@ version: '2'
 services:
   back:
     build: apps/back
-    command: npm start
+    command: bash -c "NODE_ENV=production npm start"
     environment:
       - NODE_ENV=production
       - PORT=3000
