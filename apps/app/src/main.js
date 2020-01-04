@@ -14,7 +14,7 @@ Vue.config.productionTip = false
 
 const socket = io(process.env.VUE_APP_API_ENDPOINT, {
   path: process.env.NODE_ENV === 'production'
-    ? '/bombparty/api/socket.io'
+    ? '/socket.io'
     : '/socket.io'
 })
 Vue.prototype.$socket = socket
