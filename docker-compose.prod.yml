@@ -15,7 +15,7 @@ services:
     build: apps/app
     command: bash -c "NODE_ENV=production npm start"
     environment:
-      - VUE_APP_API_ENDPOINT=http://178.62.12.76:3000
+      - VUE_APP_API_ENDPOINT=http://william.to/bombparty/api
       - PORT=80
     volumes:
       - ./apps/app:/app
