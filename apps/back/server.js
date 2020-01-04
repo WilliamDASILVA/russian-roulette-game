@@ -2,11 +2,7 @@ const app = require('express')()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const server = require('http').Server(app)
-const io = require('socket.io')(server, {
-  path: process.env.NODE_ENV === 'production'
-    ? '/bombparty/api/socket.io'
-    : '/socket.io'
-})
+const io = require('socket.io')(server)
 
 const PORT = process.env.PORT || 3000
 
