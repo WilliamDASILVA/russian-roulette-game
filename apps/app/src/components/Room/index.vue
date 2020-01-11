@@ -31,6 +31,9 @@
             <li
               v-for="(player, k) in orderedPlayers"
               :key="player.id"
+              :class="{
+                'room__sidebar__players__item--self': player.id === $socket.id
+              }"
               class="room__sidebar__players__item"
             >
               <span
@@ -43,7 +46,11 @@
               >
                 {{ player.score }}
               </span>
-              {{ player.name }}
+              <span
+                class="room__sidebar__players__item__name"
+              >
+                {{ player.name }}
+              </span>
             </li>
           </ul>
         </div>
@@ -273,10 +280,29 @@
   }
 
   .room__sidebar__players__item {
+    position: relative;
     color: rgba(255, 255, 255, 0.7);
     font-size: 1rem;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     margin-left: 8px;
+    z-index: 1;
+  }
+
+  .room__sidebar__players__item__name,
+  .room__sidebar__players__item__score {
+    z-index: 1;
+  }
+
+  .room__sidebar__players__item--self::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 100%;
+    height: 30px;
+    background: #2D3748;
+    z-index: -1;
+    border-radius: 4px;
   }
 
   .room__sidebar__players__item__score {
