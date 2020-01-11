@@ -10,7 +10,7 @@ const players = []
 setInterval(() => {
   rooms
     .filter(room => room.state === 'started')
-    .forEach((room, roomsId) => {
+    .forEach(async (room, roomsId) => {
       if (room.timer < Date.now()) {
         // Kill player
         const playerIndex = room.activePlayers
@@ -22,8 +22,9 @@ setInterval(() => {
           io.to(room.id).emit('player_lost_heart', {
             activePlayers: room.activePlayers
           })
-          room.checkGameState()
-          room.nextPlayer()
+
+          await room.checkGameState()
+          if (room.playersAlive.length > 1) room.nextPlayer()
         }
       }
 

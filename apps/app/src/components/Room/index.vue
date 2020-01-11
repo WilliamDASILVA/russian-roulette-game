@@ -29,10 +29,20 @@
           </h2>
           <ul>
             <li
-              v-for="player in getCurrentRoom.players"
+              v-for="(player, k) in orderedPlayers"
               :key="player.id"
               class="room__sidebar__players__item"
             >
+              <span
+                :class="{
+                  'room__sidebar__players__item__score--first': player.score > 0 && k === 0,
+                  'room__sidebar__players__item__score--second': player.score > 0 && k === 1,
+                  'room__sidebar__players__item__score--third': player.score > 0 && k === 2
+                }"
+                class="room__sidebar__players__item__score"
+              >
+                {{ player.score }}
+              </span>
               {{ player.name }}
             </li>
           </ul>
@@ -93,7 +103,11 @@
         })
     },
     computed: {
-      ...mapGetters(['getCurrentRoom'])
+      ...mapGetters(['getCurrentRoom']),
+      orderedPlayers () {
+        return [...this.getCurrentRoom.players]
+          .sort((a, b) => b.score - a.score)
+      }
     },
     mounted () {
       this.$socket.on('joined_room', (room) => {
@@ -132,11 +146,12 @@
         })
         console.log('ROOM STARTED...')
       })
-      this.$socket.on('room_game_finished', ({ state, activePlayers }) => {
+      this.$socket.on('room_game_finished', ({ state, players, activePlayers }) => {
         const room = this.$store.getters.getCurrentRoom
         this.$store.commit('SET_ROOM', {
           ...room,
           state,
+          players,
           activePlayers,
         })
         console.log('ROOM FINISHED...')
@@ -262,6 +277,30 @@
     font-size: 1rem;
     margin-bottom: 8px;
     margin-left: 8px;
+  }
+
+  .room__sidebar__players__item__score {
+    display: inline-block;
+    color: white;
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .room__sidebar__players__item__score--first {
+    background: #CDB950;
+  }
+
+  .room__sidebar__players__item__score--second {
+    background: #2B6CB0;
+  }
+
+  .room__sidebar__players__item__score--third {
+    background: #B6B6B6;
   }
 
   .room__content {

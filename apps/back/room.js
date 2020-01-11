@@ -139,9 +139,13 @@ module.exports = class Room {
   async checkGameState () {
     if (this.playersAlive.length === 1) {
       this.state = 'finished'
-      console.log('End game')
+
+      const winnerPlayer = this.playersAlive[0]
+      winnerPlayer.score += 1
+
       io.to(this.id).emit('room_game_finished', {
         state: this.state,
+        players: this.players,
         activePlayers: this.activePlayers
       })
 
