@@ -42,7 +42,7 @@
                   Room name
                 </label>
                 <input
-                  v-model="roomName"
+                  v-model="room.name"
                   type="text"
                   id="name"
                   class="field"
@@ -72,7 +72,7 @@
                   Room password (optional)
                 </label>
                 <input
-                  v-model="roomPassword"
+                  v-model="room.password"
                   type="password"
                   id="password"
                   class="field"
@@ -80,6 +80,44 @@
                     'field--invalid': invalid && errors.length > 0
                   }"
                 >
+                <span
+                  v-if="invalid && errors.length > 0"
+                  class="create-room-dialog__wrapper__content__error"
+                >
+                  {{ errors[0] }}
+                </span>
+              </ValidationProvider>
+            </div>
+            <div class="create-room-dialog__wrapper__content__field">
+              <ValidationProvider
+                v-slot="{ invalid, errors }"
+                name="language"
+                rules="required"
+                slim
+              >
+                <label
+                  for="language"
+                  class="create-room-dialog__wrapper__content__label"
+                >
+                  Language
+                </label>
+                <select
+                  v-model="room.language"
+                  id="language"
+                  class="field"
+                  :class="{
+                    'field--invalid': invalid && errors.length > 0
+                  }"
+                  required
+                >
+                  <option
+                    v-for="language in languagesAvailable"
+                    :key="language.value"
+                    :value="language.value"
+                  >
+                    {{ language.name }}
+                  </option>
+                </select>
                 <span
                   v-if="invalid && errors.length > 0"
                   class="create-room-dialog__wrapper__content__error"
@@ -128,8 +166,21 @@
     },
     data () {
       return {
-        roomName: null,
-        roomPassword: null
+        room: {
+          name: null,
+          password: null,
+          language: 'en'
+        },
+        languagesAvailable: [
+          {
+            name: 'French',
+            value: 'fr'
+          },
+          {
+            name: 'English',
+            value: 'en'
+          }
+        ]
       }
     },
     methods: {
@@ -142,8 +193,9 @@
 
             this.$wait.start('creating room')
             axios.post(`${process.env.VUE_APP_API_ENDPOINT}/rooms`, {
-              name: this.roomName,
-              password: this.roomPassword
+              name: this.room.name,
+              password: this.room.password,
+              language: this.room.language
             })
               .then(response => {
                 if (response.status === 201) {

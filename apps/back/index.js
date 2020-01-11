@@ -175,9 +175,10 @@ app.post('/rooms/:id/join', (req, res) => {
 })
 
 app.post('/rooms', (req, res) => {
-  const { name, password } = req.body
+  const { name, password, language } = req.body
 
   const room = new Room(name, password)
+  room.language = language
   rooms.push(room)
 
   players.forEach((player) => {

@@ -19,6 +19,9 @@
           <h1 class="room__sidebar__title">
             {{ getCurrentRoom.name }}
           </h1>
+          <div class="room__sidebar__language">
+            Language: {{ getCurrentRoom.language }}
+          </div>
         </div>
         <div class="room__sidebar__players">
           <h2 class="room__sidebar__players__title">
@@ -220,6 +223,11 @@
   .room__sidebar__players__title {
     color: white;
     font-weight: 400;
+  }
+
+  .room__sidebar__language {
+    font-size: 16px;
+    margin-top: 6px;
   }
 
   .room__sidebar__title__container {

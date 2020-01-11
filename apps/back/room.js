@@ -1,9 +1,6 @@
 const uuid = require('uuid/v4')
 const { io } = require('./server')
-const { words, letters } = require('./dictionnary')
-
-const letters_dictionnary = letters
-const words_dictionnary = words
+const { getWords, getLetters } = require('./dictionnary')
 
 const GAME_TIMER = 5
 
@@ -23,6 +20,7 @@ module.exports = class Room {
     this.timer = null
     this.gameStartTimeout = null
     this.wordTriesCount = 0
+    this.language = 'en'
   }
 
   addPlayer (player) {
@@ -99,8 +97,9 @@ module.exports = class Room {
   }
 
   changeLettersToGuess () {
-    const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
-    this.word_to_guess = letters_dictionnary[wordIndex]
+    const letters = getLetters(this.language)
+    const wordIndex = Math.floor(Math.random() * letters.length)
+    this.word_to_guess = letters[wordIndex]
     this.timer = Date.now() + (1000 * GAME_TIMER)
   }
 
@@ -170,15 +169,16 @@ module.exports = class Room {
   }
 
   guess (word) {
+    const words = getWords(this.language)
     const transformedWord = word.toLowerCase()
     const isInBlackList = this.blacklist.includes(transformedWord)
-    const isInDictionnary = words_dictionnary.includes(transformedWord)
+    const isInDictionnary = words.includes(transformedWord)
     const matchesWordToGuess = transformedWord.match(this.word_to_guess.toLowerCase())
 
     if (!isInBlackList && isInDictionnary && matchesWordToGuess) {
-      console.log('Player guessed the word', transformedWord)
-      const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
-      this.word_to_guess = letters_dictionnary[wordIndex]
+      const letters = getLetters(this.language)
+      const wordIndex = Math.floor(Math.random() * letters.length)
+      this.word_to_guess = letters[wordIndex]
       this.blacklist.push(transformedWord)
       this.wordTriesCount = 0
 

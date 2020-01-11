@@ -1,18 +1,37 @@
 const fs = require('fs')
 const path = require('path')
 
-const wordsFile = fs.readFileSync(path.resolve(__dirname, './dictionnaries/fr/words.txt'), 'utf-8')
-const words = wordsFile
-  .split('\n')
-  .filter(word => word.length >= 2)
-  .map(word => word.toLowerCase())
-  .map(word => word.normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+const words = {}
+const letters = {}
 
-const lettersFile = fs.readFileSync(path.resolve(__dirname, './dictionnaries/fr/letters-2.txt'), 'utf-8')
-const letters = lettersFile
-  .split('\n')
+/**
+ * Preload all the available languagages
+ */
+const availableLanguages = ['en', 'fr']
+availableLanguages.forEach(language => {
+  const wordsFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/words.txt`), 'utf-8')
+  const wordsContent = wordsFile
+    .split('\n')
+    .filter(word => word.length >= 2)
+    .map(word => word.toLowerCase())
+    .map(word => word.normalize("NFD").replace(/[\u0300-\u036f]/g, ""))
+
+  words[language] = wordsContent
+
+  const lettersFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/letters-2.txt`), 'utf-8')
+  letters[language] = lettersFile
+    .split('\n')
+})
+
+function getWords(language) {
+  return words[language]
+}
+
+function getLetters(language) {
+  return letters[language]
+}
 
 module.exports = {
-  words,
-  letters
+  getWords,
+  getLetters
 }
