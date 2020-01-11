@@ -95,6 +95,11 @@ io.on('connection', function (socket) {
         console.log('rooms?', socket.rooms)
 
         io.to(rooms[roomsId].id).emit('player_joined_room', rooms[roomsId])
+
+        // Emit to all players the new rooms list
+        players.forEach(player => {
+          io.to(player.id).emit('rooms_available', rooms.map(formatRooms))
+        })
         fn()
       }
     }
