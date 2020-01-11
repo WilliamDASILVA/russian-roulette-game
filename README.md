@@ -2,7 +2,6 @@
 
 TODO:
 
-- Change the letter if every player didn't find the letter
 - Allow user to create a room in a specific langage
   - Perhaps having an API to get/check words
 - Add scores per room

@@ -22,6 +22,7 @@ module.exports = class Room {
     this.currentPlayer = null
     this.timer = null
     this.gameStartTimeout = null
+    this.wordTriesCount = 0
   }
 
   addPlayer (player) {
@@ -97,14 +98,18 @@ module.exports = class Room {
     cb()
   }
 
+  changeLettersToGuess () {
+    const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
+    this.word_to_guess = letters_dictionnary[wordIndex]
+    this.timer = Date.now() + (1000 * GAME_TIMER)
+  }
+
   startGame () {
     /**
      * Pick a random letters to guess
      */
-    const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
-    this.word_to_guess = letters_dictionnary[wordIndex]
+    this.changeLettersToGuess()
     this.currentPlayer = this.activePlayers[Math.floor(Math.random() * this.activePlayers.length)]
-    this.timer = Date.now() + (1000 * GAME_TIMER)
 
     this.state = 'started'
 
@@ -147,6 +152,12 @@ module.exports = class Room {
       }, 5000)
       return false
     }
+
+    if (this.wordTriesCount === this.playersAlive.length) {
+      // Nobody found a word matching the current letters, change the letters
+      this.wordTriesCount = 0
+      this.changeLettersToGuess()
+    }
     return true
   }
 
@@ -169,6 +180,7 @@ module.exports = class Room {
       const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
       this.word_to_guess = letters_dictionnary[wordIndex]
       this.blacklist.push(transformedWord)
+      this.wordTriesCount = 0
 
       const currPlayer = this.activePlayers.findIndex(p => p.id === this.currentPlayer.id)
       console.log('player to update', this.activePlayers[currPlayer])

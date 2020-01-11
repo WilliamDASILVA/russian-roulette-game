@@ -17,6 +17,7 @@ setInterval(() => {
 
         if (playerIndex !== -1) {
           room.activePlayers[playerIndex].heart -= 1
+          room.wordTriesCount += 1
           io.to(room.id).emit('player_lost_heart', {
             activePlayers: room.activePlayers
           })
