@@ -5,6 +5,7 @@ module.exports = class Player {
     this.id = socketId
     this.name = name
     this.heart = 3
+    this.score = 0
     this.lettersToUse = LETTERS_TO_USE
     this.hasUsedAllLetters = false
   }

@@ -11,11 +11,24 @@ services:
     ports:
       - 3000:3000
       - 3001:3001
+    links:
+      - dictionnary
+  dictionnary:
+    build: apps/dictionnary
+    command: bash -c "NODE_ENV=production npm start"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+    volumes:
+      - ./apps/dictionnary:/app
+    ports:
+      - 3010:3010
+      - 3011:3011
   app:
     build: apps/app
     command: bash -c "NODE_ENV=production npm start"
     environment:
-      - VUE_APP_API_ENDPOINT=http://william.to/bombparty/api
+      - VUE_APP_API_ENDPOINT=https://api.bombparty.william.to
       - PORT=80
     volumes:
       - ./apps/app:/app

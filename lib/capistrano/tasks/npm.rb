@@ -4,6 +4,7 @@ namespace :npm do
     on roles(:all) do
       within release_path do
         execute 'docker-compose', "-f #{fetch :docker_file}", :run, 'back', 'npm ci'
+        execute 'docker-compose', "-f #{fetch :docker_file}", :run, 'dictionnary', 'npm ci'
         execute 'docker-compose', "-f #{fetch :docker_file}", :run, 'app', 'bash -c "npm ci && NODE_ENV=production npm run build"'
       end
     end

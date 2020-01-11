@@ -19,6 +19,9 @@
           <h1 class="room__sidebar__title">
             {{ getCurrentRoom.name }}
           </h1>
+          <div class="room__sidebar__language">
+            Language: {{ getCurrentRoom.language }}
+          </div>
         </div>
         <div class="room__sidebar__players">
           <h2 class="room__sidebar__players__title">
@@ -26,11 +29,28 @@
           </h2>
           <ul>
             <li
-              v-for="player in getCurrentRoom.players"
+              v-for="(player, k) in orderedPlayers"
               :key="player.id"
+              :class="{
+                'room__sidebar__players__item--self': player.id === $socket.id
+              }"
               class="room__sidebar__players__item"
             >
-              {{ player.name }}
+              <span
+                :class="{
+                  'room__sidebar__players__item__score--first': player.score > 0 && k === 0,
+                  'room__sidebar__players__item__score--second': player.score > 0 && k === 1,
+                  'room__sidebar__players__item__score--third': player.score > 0 && k === 2
+                }"
+                class="room__sidebar__players__item__score"
+              >
+                {{ player.score }}
+              </span>
+              <span
+                class="room__sidebar__players__item__name"
+              >
+                {{ player.name }}
+              </span>
             </li>
           </ul>
         </div>
@@ -90,7 +110,11 @@
         })
     },
     computed: {
-      ...mapGetters(['getCurrentRoom'])
+      ...mapGetters(['getCurrentRoom']),
+      orderedPlayers () {
+        return [...this.getCurrentRoom.players]
+          .sort((a, b) => b.score - a.score)
+      }
     },
     mounted () {
       this.$socket.on('joined_room', (room) => {
@@ -129,11 +153,12 @@
         })
         console.log('ROOM STARTED...')
       })
-      this.$socket.on('room_game_finished', ({ state, activePlayers }) => {
+      this.$socket.on('room_game_finished', ({ state, players, activePlayers }) => {
         const room = this.$store.getters.getCurrentRoom
         this.$store.commit('SET_ROOM', {
           ...room,
           state,
+          players,
           activePlayers,
         })
         console.log('ROOM FINISHED...')
@@ -222,6 +247,11 @@
     font-weight: 400;
   }
 
+  .room__sidebar__language {
+    font-size: 16px;
+    margin-top: 6px;
+  }
+
   .room__sidebar__title__container {
     margin-bottom: 24px;
   }
@@ -250,10 +280,53 @@
   }
 
   .room__sidebar__players__item {
+    position: relative;
     color: rgba(255, 255, 255, 0.7);
     font-size: 1rem;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
     margin-left: 8px;
+    z-index: 1;
+  }
+
+  .room__sidebar__players__item__name,
+  .room__sidebar__players__item__score {
+    z-index: 1;
+  }
+
+  .room__sidebar__players__item--self::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 100%;
+    height: 30px;
+    background: #2D3748;
+    z-index: -1;
+    border-radius: 4px;
+  }
+
+  .room__sidebar__players__item__score {
+    display: inline-block;
+    color: white;
+    background: transparent;
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    line-height: 20px;
+    text-align: center;
+    font-size: 14px;
+  }
+
+  .room__sidebar__players__item__score--first {
+    background: #CDB950;
+  }
+
+  .room__sidebar__players__item__score--second {
+    background: #2B6CB0;
+  }
+
+  .room__sidebar__players__item__score--third {
+    background: #B6B6B6;
   }
 
   .room__content {

@@ -10,6 +10,18 @@ services:
     ports:
       - 3000:3000
       - 3001:3001
+    links:
+      - dictionnary
+  dictionnary:
+    build: apps/dictionnary
+    command: npm run dev
+    environment:
+      - PORT=3010
+    volumes:
+      - ./apps/dictionnary:/app
+    ports:
+      - 3010:3010
+      - 3011:3011
   app:
     build: apps/app
     command: bash -c "VUE_APP_API_ENDPOINT='http://localhost:3000' npm run dev"

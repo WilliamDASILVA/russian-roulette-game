@@ -1,9 +1,6 @@
+const axios = require('axios')
 const uuid = require('uuid/v4')
 const { io } = require('./server')
-const { words, letters } = require('./dictionnary')
-
-const letters_dictionnary = letters
-const words_dictionnary = words
 
 const GAME_TIMER = 5
 
@@ -22,6 +19,8 @@ module.exports = class Room {
     this.currentPlayer = null
     this.timer = null
     this.gameStartTimeout = null
+    this.wordTriesCount = 0
+    this.language = 'en'
   }
 
   addPlayer (player) {
@@ -97,14 +96,18 @@ module.exports = class Room {
     cb()
   }
 
-  startGame () {
+  async changeLettersToGuess () {
+    const res = await axios.get(`http://dictionnary:3010/locales/${this.language}/letters`)
+    this.word_to_guess = res.data.letter
+    this.timer = Date.now() + (1000 * GAME_TIMER)
+  }
+
+  async startGame () {
     /**
      * Pick a random letters to guess
      */
-    const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
-    this.word_to_guess = letters_dictionnary[wordIndex]
+    await this.changeLettersToGuess()
     this.currentPlayer = this.activePlayers[Math.floor(Math.random() * this.activePlayers.length)]
-    this.timer = Date.now() + (1000 * GAME_TIMER)
 
     this.state = 'started'
 
@@ -133,12 +136,16 @@ module.exports = class Room {
     })
   }
 
-  checkGameState () {
+  async checkGameState () {
     if (this.playersAlive.length === 1) {
       this.state = 'finished'
-      console.log('End game')
+
+      const winnerPlayer = this.playersAlive[0]
+      winnerPlayer.score += 1
+
       io.to(this.id).emit('room_game_finished', {
         state: this.state,
+        players: this.players,
         activePlayers: this.activePlayers
       })
 
@@ -146,6 +153,12 @@ module.exports = class Room {
         this.resetRoom()
       }, 5000)
       return false
+    }
+
+    if (this.wordTriesCount === this.playersAlive.length) {
+      // Nobody found a word matching the current letters, change the letters
+      this.wordTriesCount = 0
+      await this.changeLettersToGuess()
     }
     return true
   }
@@ -158,17 +171,23 @@ module.exports = class Room {
     })
   }
 
-  guess (word) {
+  async guess (word) {
+    try {
+      await axios.post(`http://dictionnary:3010/locales/${this.language}/words`, {
+        word
+      })
+    } catch (err) {
+      return false
+    }
+
     const transformedWord = word.toLowerCase()
     const isInBlackList = this.blacklist.includes(transformedWord)
-    const isInDictionnary = words_dictionnary.includes(transformedWord)
     const matchesWordToGuess = transformedWord.match(this.word_to_guess.toLowerCase())
 
-    if (!isInBlackList && isInDictionnary && matchesWordToGuess) {
-      console.log('Player guessed the word', transformedWord)
-      const wordIndex = Math.floor(Math.random() * letters_dictionnary.length)
-      this.word_to_guess = letters_dictionnary[wordIndex]
+    if (!isInBlackList && matchesWordToGuess) {
+      await this.changeLettersToGuess()
       this.blacklist.push(transformedWord)
+      this.wordTriesCount = 0
 
       const currPlayer = this.activePlayers.findIndex(p => p.id === this.currentPlayer.id)
       console.log('player to update', this.activePlayers[currPlayer])

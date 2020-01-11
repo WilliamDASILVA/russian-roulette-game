@@ -5,12 +5,19 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
+  import store from '@/store'
+
   export default {
     name: 'app',
-    mounted () {
+    async mounted () {
       this.$socket.on('initiate_room', (players) => {
         this.players = players
       })
+
+      const res = await axios.get(`${process.env.VUE_APP_API_ENDPOINT}/locales`)
+      store.commit('SET_AVAILABLE_LOCALES', res.data.locales)
     },
     data () {
       return {

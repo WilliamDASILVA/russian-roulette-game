@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4')
+const axios = require('axios')
 const { io, app } = require('./server')
 const Room = require('./room')
 const Player = require('./player')
@@ -9,7 +10,7 @@ const players = []
 setInterval(() => {
   rooms
     .filter(room => room.state === 'started')
-    .forEach((room, roomsId) => {
+    .forEach(async (room, roomsId) => {
       if (room.timer < Date.now()) {
         // Kill player
         const playerIndex = room.activePlayers
@@ -17,11 +18,13 @@ setInterval(() => {
 
         if (playerIndex !== -1) {
           room.activePlayers[playerIndex].heart -= 1
+          room.wordTriesCount += 1
           io.to(room.id).emit('player_lost_heart', {
             activePlayers: room.activePlayers
           })
-          room.checkGameState()
-          room.nextPlayer()
+
+          await room.checkGameState()
+          if (room.playersAlive.length > 1) room.nextPlayer()
         }
       }
 
@@ -95,6 +98,11 @@ io.on('connection', function (socket) {
         console.log('rooms?', socket.rooms)
 
         io.to(rooms[roomsId].id).emit('player_joined_room', rooms[roomsId])
+
+        // Emit to all players the new rooms list
+        players.forEach(player => {
+          io.to(player.id).emit('rooms_available', rooms.map(formatRooms))
+        })
         fn()
       }
     }
@@ -169,9 +177,10 @@ app.post('/rooms/:id/join', (req, res) => {
 })
 
 app.post('/rooms', (req, res) => {
-  const { name, password } = req.body
+  const { name, password, language } = req.body
 
   const room = new Room(name, password)
+  room.language = language
   rooms.push(room)
 
   players.forEach((player) => {
@@ -179,4 +188,11 @@ app.post('/rooms', (req, res) => {
   })
 
   res.status(201).send(room)
+})
+
+app.get('/locales', async (req, res) => {
+  const r = await axios.get('http://dictionnary:3010/locales')
+  res.status(200).send({
+    locales: r.data.locales
+  })
 })
