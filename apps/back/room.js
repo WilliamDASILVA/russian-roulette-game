@@ -1,6 +1,6 @@
+const axios = require('axios')
 const uuid = require('uuid/v4')
 const { io } = require('./server')
-const { getWords, getLetters } = require('./dictionnary')
 
 const GAME_TIMER = 5
 
@@ -96,18 +96,17 @@ module.exports = class Room {
     cb()
   }
 
-  changeLettersToGuess () {
-    const letters = getLetters(this.language)
-    const wordIndex = Math.floor(Math.random() * letters.length)
-    this.word_to_guess = letters[wordIndex]
+  async changeLettersToGuess () {
+    const res = await axios.get(`http://dictionnary:3010/locales/${this.language}/letters`)
+    this.word_to_guess = res.data.letter
     this.timer = Date.now() + (1000 * GAME_TIMER)
   }
 
-  startGame () {
+  async startGame () {
     /**
      * Pick a random letters to guess
      */
-    this.changeLettersToGuess()
+    await this.changeLettersToGuess()
     this.currentPlayer = this.activePlayers[Math.floor(Math.random() * this.activePlayers.length)]
 
     this.state = 'started'
@@ -137,7 +136,7 @@ module.exports = class Room {
     })
   }
 
-  checkGameState () {
+  async checkGameState () {
     if (this.playersAlive.length === 1) {
       this.state = 'finished'
       console.log('End game')
@@ -155,7 +154,7 @@ module.exports = class Room {
     if (this.wordTriesCount === this.playersAlive.length) {
       // Nobody found a word matching the current letters, change the letters
       this.wordTriesCount = 0
-      this.changeLettersToGuess()
+      await this.changeLettersToGuess()
     }
     return true
   }
@@ -168,17 +167,21 @@ module.exports = class Room {
     })
   }
 
-  guess (word) {
-    const words = getWords(this.language)
+  async guess (word) {
+    try {
+      await axios.post(`http://dictionnary:3010/locales/${this.language}/words`, {
+        word
+      })
+    } catch (err) {
+      return false
+    }
+
     const transformedWord = word.toLowerCase()
     const isInBlackList = this.blacklist.includes(transformedWord)
-    const isInDictionnary = words.includes(transformedWord)
     const matchesWordToGuess = transformedWord.match(this.word_to_guess.toLowerCase())
 
-    if (!isInBlackList && isInDictionnary && matchesWordToGuess) {
-      const letters = getLetters(this.language)
-      const wordIndex = Math.floor(Math.random() * letters.length)
-      this.word_to_guess = letters[wordIndex]
+    if (!isInBlackList && matchesWordToGuess) {
+      await this.changeLettersToGuess()
       this.blacklist.push(transformedWord)
       this.wordTriesCount = 0
 

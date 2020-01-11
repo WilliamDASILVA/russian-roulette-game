@@ -1,14 +1,15 @@
 const fs = require('fs')
 const path = require('path')
 
+const { availableLocales } = require('./config')
+
 const words = {}
 const letters = {}
 
 /**
  * Preload all the available languagages
  */
-const availableLanguages = ['en', 'fr']
-availableLanguages.forEach(language => {
+availableLocales.forEach(language => {
   const wordsFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/words.txt`), 'utf-8')
   const wordsContent = wordsFile
     .split('\n')
@@ -18,17 +19,20 @@ availableLanguages.forEach(language => {
 
   words[language] = wordsContent
 
-  const lettersFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/letters-2.txt`), 'utf-8')
-  letters[language] = lettersFile
-    .split('\n')
+  let lettersFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/letters-2.txt`), 'utf-8')
+  letters[language] = {}
+  letters[language][2] = lettersFile.split('\n')
+
+  lettersFile = fs.readFileSync(path.resolve(__dirname, `./dictionnaries/${language}/letters-3.txt`), 'utf-8')
+  letters[language][3] = lettersFile.split('\n')
 })
 
 function getWords(language) {
   return words[language]
 }
 
-function getLetters(language) {
-  return letters[language]
+function getLetters(language, length) {
+  return letters[language][length]
 }
 
 module.exports = {
