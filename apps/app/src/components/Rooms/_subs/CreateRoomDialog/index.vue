@@ -152,6 +152,7 @@
 
 <script>
   import axios from 'axios'
+  import { mapGetters } from 'vuex'
 
   /**
    * @module component - CreateRoomDialog
@@ -170,17 +171,18 @@
           name: null,
           password: null,
           language: 'en'
-        },
-        languagesAvailable: [
-          {
-            name: 'French',
-            value: 'fr'
-          },
-          {
-            name: 'English',
-            value: 'en'
-          }
-        ]
+        }
+      }
+    },
+    computed: {
+      ...mapGetters([
+        'getAvailableLocales'
+      ]),
+      languagesAvailable () {
+        return this.getAvailableLocales.map(locale => ({
+          name: locale,
+          value: locale
+        }))
       }
     },
     methods: {

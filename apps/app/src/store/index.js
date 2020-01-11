@@ -5,6 +5,7 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
   state: {
+    availableLocales: ['en'],
     rooms: [],
     room: null,
     username: null
@@ -12,6 +13,9 @@ const store = new Vuex.Store({
   mutations: {
     SET_ROOMS (state, rooms) {
       state.rooms = rooms
+    },
+    SET_AVAILABLE_LOCALES (state, locales) {
+      state.availableLocales = locales
     },
     SET_ROOM (state, room) {
       state.room = room
@@ -21,6 +25,9 @@ const store = new Vuex.Store({
     }
   },
   getters: {
+    getAvailableLocales (state) {
+      return state.availableLocales
+    },
     getRooms (state) {
       return state.rooms
     },

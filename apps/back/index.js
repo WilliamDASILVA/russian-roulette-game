@@ -1,4 +1,5 @@
 const uuid = require('uuid/v4')
+const axios = require('axios')
 const { io, app } = require('./server')
 const Room = require('./room')
 const Player = require('./player')
@@ -186,4 +187,11 @@ app.post('/rooms', (req, res) => {
   })
 
   res.status(201).send(room)
+})
+
+app.get('/locales', async (req, res) => {
+  const r = await axios.get('http://dictionnary:3010/locales')
+  res.status(200).send({
+    locales: r.data.locales
+  })
 })
